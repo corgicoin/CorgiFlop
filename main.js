@@ -6,8 +6,9 @@ var SPAWN_RATE = 1 / 1.2;
 var OPENING = 144;
 
 // Load in Clay.io API
+/*
 var Clay = Clay || {};
-Clay.gameKey = "dtmb";
+Clay.gameKey = "corgiflop";
 Clay.readyFunctions = [];
 Clay.ready = function( fn ) {
     Clay.readyFunctions.push( fn );
@@ -31,15 +32,34 @@ Clay.ready = function( fn ) {
     clay.src = "http://cdn.clay.io/api.js"; 
     var tag = document.getElementsByTagName("script")[0]; tag.parentNode.insertBefore(clay, tag);
 } )();
+*/
+
+
+jQuery(document).ready(function() {
+    WebFontConfig = {
+        google: { families: [ 'Press+Start+2P::latin' ] },
+        active: main
+    };
+    (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+    })(); 
+});
+
 
 function main() {
 
-var state = {
-    preload: preload,
-    create: create,
-    update: update,
-    render: render
-};
+	var state = {
+	    preload: preload,
+	    create: create,
+	    update: update,
+	    render: render
+	};
 
 var parent = document.querySelector('#screen');
 
@@ -54,6 +74,7 @@ var game = new Phaser.Game(
 );
 
 
+/*
 function clayLoaded() {
     // Set up the menu items
     var options = {
@@ -62,9 +83,10 @@ function clayLoaded() {
         ]
     };
     Clay.UI.Menu.init(options);
-    leaderboard = new Clay.Leaderboard({ id: 2797 });
+    leaderboard = new Clay.Leaderboard({ id: 2956 });
 }
 Clay.ready(clayLoaded);
+*/
 
 function showScores() {
     if (leaderboard) {
@@ -73,7 +95,7 @@ function showScores() {
 }
 
 function kikThis() {
-    Clay.Kik.post( { message: 'I just scored ' + score + ' in Heavy Bird! Think you can beat my score?', title: 'Heavy Bird!' } );
+//    Clay.Kik.post( { message: 'I just scored ' + score + ' in Heavy Bird! Think you can beat my score?', title: 'Heavy Bird!' } );
 }
 
 function postScore() {
@@ -91,6 +113,7 @@ function postScore() {
         });
     }
     
+/*
     if (Clay.Environment.platform == 'kik') {
 	    Clay.Kik.connect({}, function(response) {
 	        if (response.success) {
@@ -103,6 +126,7 @@ function postScore() {
     } else {
     	post();
     }
+*/
     	
 }
 
@@ -151,12 +175,15 @@ var gameStarted,
     scoreSnd,
     hurtSnd,
     towersTimer,
-    cloudsTimer;
+    cloudsTimer,
+    sbPress,
+    is_muted;
 
 function create() {
     // Set world dimensions
     var screenWidth = parent.clientWidth > window.innerWidth ? window.innerWidth : parent.clientWidth;
     var screenHeight = parent.clientHeight > window.innerHeight ? window.innerHeight : parent.clientHeight;
+    is_muted = false;
     game.world.width = screenWidth;
     game.world.height = screenHeight;
     // Draw bg
@@ -168,7 +195,7 @@ function create() {
     credits = game.add.text(
         game.world.width / 2,
         10,
-        'marksteve.com/dtmb\n@themarksteve',
+        '',
         {
             font: '8px "Press Start 2P"',
             fill: '#fff',
@@ -200,8 +227,8 @@ function create() {
         {
             font: '32px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#430',
-            strokeThickness: 8,
+            stroke: '#de9542',
+            strokeThickness: 12,
             align: 'center'
         }
     );
@@ -237,7 +264,8 @@ function create() {
     
     // Add kik this text (hidden until game is over)
     postScoreText = game.add.text(
-        game.world.width / (Clay.Environment.platform == 'kik' ?  4 : 2),
+//        game.world.width / (Clay.Environment.platform == 'kik' ?  4 : 2),
+        game.world.width / 2,
         game.world.height / 2,
         "",
         {
@@ -251,7 +279,6 @@ function create() {
     postScoreText.setText("POST\nSCORE!");
     postScoreText.anchor.setTo(0.5, 0.5);
     postScoreText.renderable = false;
-    // So we can have clickable text... we check if the mousedown/touch event is within this rectangle inside flap()
     postScoreClickArea = new Phaser.Rectangle(postScoreText.x - postScoreText.width / 2, postScoreText.y - postScoreText.height / 2, postScoreText.width, postScoreText.height);
     
     // Add kik this text (hidden until game is over)
@@ -261,7 +288,7 @@ function create() {
         "",
         {
             font: '20px "Press Start 2P"',
-            fill: '#fff',
+            fill: '#fff',	
             stroke: '#430',
             strokeThickness: 8,
             align: 'center'
@@ -274,11 +301,21 @@ function create() {
     kikThisClickArea = new Phaser.Rectangle(kikThisText.x - kikThisText.width / 2, kikThisText.y - kikThisText.height / 2, kikThisText.width, kikThisText.height);
     
     // Add sounds
+    
     flapSnd = game.add.audio('flap');
     scoreSnd = game.add.audio('score');
     hurtSnd = game.add.audio('hurt');
     // Add controls
+
+	// map flaps        
+    sbPress = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    sbPress.onDown.add(flap);
     game.input.onDown.add(flap);
+
+	// map mute
+    mutePress = game.input.keyboard.addKey(Phaser.Keyboard.V);
+    mutePress.onDown.add(mute_toggle);
+    
     // Start clouds timer
     cloudsTimer = new Phaser.Timer(game);
     cloudsTimer.onEvent.add(spawnCloud);
@@ -288,13 +325,23 @@ function create() {
     reset();
 }
 
+function mute_toggle() {
+	if (is_muted) {
+		game.sound.mute = false;	
+		is_muted = false;
+	} else {
+		game.sound.mute = true;	
+		is_muted = true;
+	}
+}
+
 function reset() {
     gameStarted = false;
     gameOver = false;
     score = 0;
     credits.renderable = true;
-    scoreText.setText("HEAVY\nBIRD");
-    instText.setText("TOUCH TO\nFLAP WINGS");
+    scoreText.setText("CORGI\nFLOP");
+    instText.setText("TOUCH / TO\nFLAP WINGS\n\nV for Mute");
     highScoreText.renderable = false;
     postScoreText.renderable = false;
     kikThisText.renderable = false;
@@ -335,9 +382,11 @@ function flap() {
             postScore();
         }
         // Check if the touch event is within our text for sending a kik message
+/*
         else if (Clay.Environment.platform == 'kik' && kikThisClickArea && Phaser.Rectangle.contains(kikThisClickArea, game.input.x, game.input.y)) {
             kikThis();
         }
+*/
     }
 }
 
@@ -413,19 +462,21 @@ function addScore(_, inv) {
 
 function setGameOver() {
     gameOver = true;
-    instText.setText("TOUCH BIRD\nTO TRY AGAIN");
+    instText.setText("TOUCH CORGI\nTO TRY AGAIN");
     instText.renderable = true;
     var hiscore = window.localStorage.getItem('hiscore');
     hiscore = hiscore ? hiscore : score;
     hiscore = score > parseInt(hiscore, 10) ? score : hiscore;
     window.localStorage.setItem('hiscore', hiscore);
-    highScoreText.setText("HIGHSCORE\n" + hiscore);
+    highScoreText.setText("HIGH SCORE\n" + hiscore);
     highScoreText.renderable = true;
     
-    postScoreText.renderable = true;
+//    postScoreText.renderable = true;
+/*
     if (Clay.Environment.platform == 'kik') {
         kikThisText.renderable = true;
     }
+*/
     
     // Stop all towers
     towers.forEachAlive(function(tower) {
@@ -438,6 +489,10 @@ function setGameOver() {
     towersTimer.stop();
     // Make birdie reset the game
     birdie.events.onInputDown.addOnce(reset);
+    
+//    sbPress = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    sbPress.onDown.addOnce(reset);
+    
     hurtSnd.play();
 }
 
