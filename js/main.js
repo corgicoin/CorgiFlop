@@ -1,18 +1,14 @@
+var $j = jQuery;
+
 var DEBUG = false;
 var SPEED = 180;
 var GRAVITY = 18;
 var FLAP = 420;
 var SPAWN_RATE = 1 / 1.2;
 var OPENING = 144;
+var faucet = "http://givemecorgicoins.local";
 
-// Load in Clay.io API
-/*
-var Clay = Clay || {};
-Clay.gameKey = "corgiflop";
-Clay.readyFunctions = [];
-Clay.ready = function( fn ) {
-    Clay.readyFunctions.push( fn );
-    // Load game
+$j(document).ready(function() {
     WebFontConfig = {
         google: { families: [ 'Press+Start+2P::latin' ] },
         active: main
@@ -26,29 +22,13 @@ Clay.ready = function( fn ) {
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
     })(); 
-};
-( function() {
-    var clay = document.createElement("script"); clay.async = true;
-    clay.src = "http://cdn.clay.io/api.js"; 
-    var tag = document.getElementsByTagName("script")[0]; tag.parentNode.insertBefore(clay, tag);
-} )();
-*/
-
-
-jQuery(document).ready(function() {
-    WebFontConfig = {
-        google: { families: [ 'Press+Start+2P::latin' ] },
-        active: main
-    };
-    (function() {
-        var wf = document.createElement('script');
-        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-        wf.type = 'text/javascript';
-        wf.async = 'true';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(wf, s);
-    })(); 
+    
+	function reorient(e) {
+		var portrait = (window.orientation % 180 == 0);
+		$("body > div").css("-webkit-transform", portrait ? "rotate(-90deg)" : "");
+	}
+	window.onorientationchange = reorient;
+	window.setTimeout(reorient, 0);
 });
 
 
@@ -74,20 +54,6 @@ var game = new Phaser.Game(
 );
 
 
-/*
-function clayLoaded() {
-    // Set up the menu items
-    var options = {
-        items: [
-            { title: 'View High Scores', handler: showScores }
-        ]
-    };
-    Clay.UI.Menu.init(options);
-    leaderboard = new Clay.Leaderboard({ id: 2956 });
-}
-Clay.ready(clayLoaded);
-*/
-
 function showScores() {
     if (leaderboard) {
         leaderboard.show({ best: true });
@@ -95,45 +61,26 @@ function showScores() {
 }
 
 function kikThis() {
-//    Clay.Kik.post( { message: 'I just scored ' + score + ' in Heavy Bird! Think you can beat my score?', title: 'Heavy Bird!' } );
 }
 
 function postScore() {
-    if( postingScore ) // skip if it's already trying to post the score...
-        return;
+    if ( postingScore ) {
+	    return;
+    }
     postScoreText.setText('...');
     postingScore = true;
-    
-    var post = function() {
-    	if(!leaderboard) return;
-        leaderboard.post({ score: score }, function() {
-            showScores();
-            postScoreText.setText('POST\nSCORE!');
-            postingScore = false;
-        });
-    }
-    
-/*
-    if (Clay.Environment.platform == 'kik') {
-	    Clay.Kik.connect({}, function(response) {
-	        if (response.success) {
-	            Clay.Player.onUserReady( post );
-	        } else {
-	            postScoreText.setText('POST\nSCORE!');            
-	            postingScore = false;
-	        }
-	    });
-    } else {
-    	post();
-    }
-*/
-    	
+	$j.getJSON(faucet + "/flop/index?coins=" + score, function(d) {
+		var key = d.body.data.key;
+		if (key) {
+			window.location.href = faucet + "/flop/redeem/" + key;
+		}
+	});
 }
 
 function preload() {
     var assets = {
         spritesheet: {
-            birdie: ['assets/birdie.png', 24, 24],
+            doggie: ['assets/doggie.png', 24, 24],
             clouds: ['assets/clouds.png', 128, 64]
         },
         image: {
@@ -161,7 +108,7 @@ var gameStarted,
     clouds,
     towers,
     invs,
-    birdie,
+    doggie,
     fence,
     scoreText,
     instText,
@@ -209,13 +156,13 @@ function create() {
     towers = game.add.group();
     // Add invisible thingies
     invs = game.add.group();
-    // Add birdie
-    birdie = game.add.sprite(0, 0, 'birdie');
-    birdie.anchor.setTo(0.5, 0.5);
-    birdie.animations.add('fly', [0, 1, 2, 3], 10, true);
-    birdie.inputEnabled = true;
-    birdie.body.collideWorldBounds = true;
-    birdie.body.gravity.y = GRAVITY;
+    // Add doggie
+    doggie = game.add.sprite(0, 0, 'doggie');
+    doggie.anchor.setTo(0.5, 0.5);
+    doggie.animations.add('fly', [0, 1, 2, 3], 10, true);
+    doggie.inputEnabled = true;
+    doggie.body.collideWorldBounds = true;
+    doggie.body.gravity.y = GRAVITY;
     // Add fence
     fence = game.add.tileSprite(0, game.world.height - 32, game.world.width, 32, 'fence');
     fence.tileScale.setTo(2, 2);
@@ -241,7 +188,7 @@ function create() {
         {
             font: '16px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#430',
+            stroke: '#000',
             strokeThickness: 8,
             align: 'center'
         }
@@ -255,31 +202,30 @@ function create() {
         {
             font: '24px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#430',
+            stroke: '#000',
             strokeThickness: 8,
             align: 'center'
         }
     );
     highScoreText.anchor.setTo(0.5, 0.5);
     
-    // Add kik this text (hidden until game is over)
     postScoreText = game.add.text(
-//        game.world.width / (Clay.Environment.platform == 'kik' ?  4 : 2),
         game.world.width / 2,
         game.world.height / 2,
         "",
         {
             font: '20px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#430',
+            stroke: '#309830',
             strokeThickness: 8,
             align: 'center'
         }
     );
-    postScoreText.setText("POST\nSCORE!");
+    postScoreText.setText("CLAIM\nCORGICOINS!");
     postScoreText.anchor.setTo(0.5, 0.5);
     postScoreText.renderable = false;
-    postScoreClickArea = new Phaser.Rectangle(postScoreText.x - postScoreText.width / 2, postScoreText.y - postScoreText.height / 2, postScoreText.width, postScoreText.height);
+    
+    postScoreClickArea = new Phaser.Rectangle(0, postScoreText.y - postScoreText.height / 2, game.world.width, postScoreText.height*2);
     
     // Add kik this text (hidden until game is over)
     kikThisText = game.add.text(
@@ -289,7 +235,7 @@ function create() {
         {
             font: '20px "Press Start 2P"',
             fill: '#fff',	
-            stroke: '#430',
+            stroke: '#000',
             strokeThickness: 8,
             align: 'center'
         }
@@ -297,11 +243,9 @@ function create() {
     kikThisText.setText("KIK\nTHIS!");
     kikThisText.anchor.setTo(0.5, 0.5);
     kikThisText.renderable = false;
-    // So we can have clickable text... we check if the mousedown/touch event is within this rectangle inside flap()
     kikThisClickArea = new Phaser.Rectangle(kikThisText.x - kikThisText.width / 2, kikThisText.y - kikThisText.height / 2, kikThisText.width, kikThisText.height);
     
     // Add sounds
-    
     flapSnd = game.add.audio('flap');
     scoreSnd = game.add.audio('score');
     hurtSnd = game.add.audio('hurt');
@@ -309,7 +253,6 @@ function create() {
 
 	// map flaps        
     sbPress = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    sbPress.onDown.add(flap);
     game.input.onDown.add(flap);
 
 	// map mute
@@ -336,27 +279,34 @@ function mute_toggle() {
 }
 
 function reset() {
+
+    doggie.events.onInputDown.removeAll();
+    sbPress.onDown.removeAll();
+
+	// map spacebar 
+    sbPress.onDown.add(flap);
+    
     gameStarted = false;
     gameOver = false;
     score = 0;
     credits.renderable = true;
     scoreText.setText("CORGI\nFLOP");
-    instText.setText("TOUCH / TO\nFLAP WINGS\n\nV for Mute");
+    instText.setText("TOUCH TO\nFLAP WINGS\n\nV for Mute");
     highScoreText.renderable = false;
     postScoreText.renderable = false;
     kikThisText.renderable = false;
-    birdie.body.allowGravity = false;
-    birdie.angle = 0;
-    birdie.reset(game.world.width / 4, game.world.height / 2);
-    birdie.scale.setTo(2, 2);
-    birdie.animations.play('fly');
+    doggie.body.allowGravity = false;
+    doggie.angle = 0;
+    doggie.reset(game.world.width / 4, game.world.height / 2);
+    doggie.scale.setTo(2, 2);
+    doggie.animations.play('fly');
     towers.removeAll();
     invs.removeAll();
 }
 
 function start() {
     credits.renderable = false;
-    birdie.body.allowGravity = true;
+    doggie.body.allowGravity = true;
     // SPAWN FINGERS!
     towersTimer = new Phaser.Timer(game);
     towersTimer.onEvent.add(spawnTowers);
@@ -374,19 +324,13 @@ function flap() {
         start();
     }
     if (!gameOver) {
-        birdie.body.velocity.y = -FLAP;
+        doggie.body.velocity.y = -FLAP;
         flapSnd.play();
     } else {
         // Check if the touch event is within our text for posting a score
         if (postScoreClickArea && Phaser.Rectangle.contains(postScoreClickArea, game.input.x, game.input.y)) {
             postScore();
         }
-        // Check if the touch event is within our text for sending a kik message
-/*
-        else if (Clay.Environment.platform == 'kik' && kikThisClickArea && Phaser.Rectangle.contains(kikThisClickArea, game.input.x, game.input.y)) {
-            kikThis();
-        }
-*/
     }
 }
 
@@ -471,12 +415,9 @@ function setGameOver() {
     highScoreText.setText("HIGH SCORE\n" + hiscore);
     highScoreText.renderable = true;
     
-//    postScoreText.renderable = true;
-/*
-    if (Clay.Environment.platform == 'kik') {
-        kikThisText.renderable = true;
-    }
-*/
+	if (score > 0) {
+//	    postScoreText.renderable = true;
+	}    
     
     // Stop all towers
     towers.forEachAlive(function(tower) {
@@ -487,40 +428,39 @@ function setGameOver() {
     });
     // Stop spawning towers
     towersTimer.stop();
-    // Make birdie reset the game
-    birdie.events.onInputDown.addOnce(reset);
-    
-//    sbPress = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+    // resets
     sbPress.onDown.addOnce(reset);
+    doggie.events.onInputDown.addOnce(reset);
     
     hurtSnd.play();
 }
 
 function update() {
     if (gameStarted) {
-        // Make birdie dive
-        var dvy = FLAP + birdie.body.velocity.y;
-        birdie.angle = (90 * dvy / FLAP) - 180;
-        if (birdie.angle < -30) {
-            birdie.angle = -30;
+        // Make doggie dive
+        var dvy = FLAP + doggie.body.velocity.y;
+        doggie.angle = (90 * dvy / FLAP) - 180;
+        if (doggie.angle < -30) {
+            doggie.angle = -30;
         }
         if (
             gameOver ||
-            birdie.angle > 90 ||
-            birdie.angle < -90
+            doggie.angle > 90 ||
+            doggie.angle < -90
         ) {
-            birdie.angle = 90;
-            birdie.animations.stop();
-            birdie.frame = 3;
+            doggie.angle = 90;
+            doggie.animations.stop();
+            doggie.frame = 3;
         } else {
-            birdie.animations.play('fly');
+            doggie.animations.play('fly');
         }
-        // Birdie is DEAD!
+        // doggie is DEAD!
         if (gameOver) {
-            if (birdie.scale.x < 4) {
-                birdie.scale.setTo(
-                    birdie.scale.x * 1.2,
-                    birdie.scale.y * 1.2
+            if (doggie.scale.x < 4) {
+                doggie.scale.setTo(
+                    doggie.scale.x * 1.2,
+                    doggie.scale.y * 1.2
                 );
             }
             highScoreText.scale.setTo(
@@ -531,12 +471,12 @@ function update() {
             kikThisText.angle = Math.random() * 5 * Math.sin(game.time.now / 100);
         } else {
             // Check game over
-            game.physics.overlap(birdie, towers, setGameOver);
-            if (!gameOver && birdie.body.bottom >= game.world.bounds.bottom) {
+            game.physics.overlap(doggie, towers, setGameOver);
+            if (!gameOver && doggie.body.bottom >= game.world.bounds.bottom) {
                 setGameOver();
             }
             // Add score
-            game.physics.overlap(birdie, invs, addScore);
+            game.physics.overlap(doggie, invs, addScore);
         }
         // Remove offscreen towers
         towers.forEachAlive(function(tower) {
@@ -547,7 +487,7 @@ function update() {
         // Update tower timer
         towersTimer.update();
     } else {
-        birdie.y = (game.world.height / 2) + 8 * Math.cos(game.time.now / 200);
+        doggie.y = (game.world.height / 2) + 8 * Math.cos(game.time.now / 200);
     }
     if (!gameStarted || gameOver) {
         // Shake instructions text
@@ -577,7 +517,7 @@ function update() {
 
 function render() {
     if (DEBUG) {
-        game.debug.renderSpriteBody(birdie);
+        game.debug.renderSpriteBody(doggie);
         towers.forEachAlive(function(tower) {
             game.debug.renderSpriteBody(tower);
         });
