@@ -22,13 +22,6 @@ $j(document).ready(function() {
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
     })(); 
-    
-	function reorient(e) {
-		var portrait = (window.orientation % 180 == 0);
-		$("body > div").css("-webkit-transform", !portrait ? "rotate(-90deg)" : "");
-	}
-	window.onorientationchange = reorient;
-	window.setTimeout(reorient, 0);
 });
 
 
@@ -188,7 +181,7 @@ function create() {
         {
             font: '16px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#000',
+            stroke: '#466d85',
             strokeThickness: 8,
             align: 'center'
         }
@@ -202,7 +195,7 @@ function create() {
         {
             font: '24px "Press Start 2P"',
             fill: '#fff',
-            stroke: '#000',
+            stroke: '#466d85',
             strokeThickness: 8,
             align: 'center'
         }
@@ -235,7 +228,7 @@ function create() {
         {
             font: '20px "Press Start 2P"',
             fill: '#fff',	
-            stroke: '#000',
+            stroke: '#466d85',
             strokeThickness: 8,
             align: 'center'
         }
