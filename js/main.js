@@ -67,6 +67,12 @@ function postScore() {
 		if (key) {
 			window.location.href = faucet + "/flop/redeem/" + key;
 		}
+		
+		// check if we had an error..
+		if (d.body.status == "error") {
+		    postScoreText.setText(d.body.message + "!");
+		}
+		
 	});
 }
 
