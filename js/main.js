@@ -6,7 +6,7 @@ var GRAVITY = 18;
 var FLAP = 420;
 var SPAWN_RATE = 1 / 1.2;
 var OPENING = 144;
-var faucet = "http://givemecorgicoins.local";
+var faucet = "http://givemecorgicoins.com";
 
 $j(document).ready(function() {
     WebFontConfig = {
@@ -409,7 +409,7 @@ function setGameOver() {
     highScoreText.renderable = true;
     
 	if (score > 0) {
-//	    postScoreText.renderable = true;
+	    postScoreText.renderable = true;
 	}    
     
     // Stop all towers
