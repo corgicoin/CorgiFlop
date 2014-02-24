@@ -63,16 +63,15 @@ function postScore() {
     postScoreText.setText('...');
     postingScore = true;
 	$j.getJSON(faucet + "/flop/index?coins=" + score, function(d) {
-		var key = d.body.data.key;
-		if (key) {
-			window.location.href = faucet + "/flop/redeem/" + key;
-		}
-		
 		// check if we had an error..
 		if (d.body.status == "error") {
 		    postScoreText.setText(d.body.message + "!");
+		} else {
+			var key = d.body.data.key;
+			if (key) {
+				window.location.href = faucet + "/flop/redeem/" + key;
+			}
 		}
-		
 	});
 }
 
