@@ -64,10 +64,10 @@ function postScore() {
     postingScore = true;
 	$j.getJSON(faucet + "/flop/index?coins=" + score, function(d) {
 		// check if we had an error..
-		if (d.body.status == "error") {
-		    postScoreText.setText(d.body.message + "!");
+		if (d.status == "error") {
+		    postScoreText.setText(d.message + "!");
 		} else {
-			var key = d.body.data.key;
+			var key = d.data.key;
 			if (key) {
 				window.location.href = faucet + "/flop/redeem/" + key;
 			}
