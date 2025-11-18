@@ -217,22 +217,14 @@ export default class MainScene extends Phaser.Scene {
 
   spawnTower(towerY, flipped = false) {
     const { width } = this.cameras.main;
-    const opening = this.getOpening();
 
-    const tower = this.towers.create(
-      width,
-      towerY + (flipped ? -opening : opening) / 2,
-      'tower'
-    );
+    const tower = this.towers.create(width, towerY, 'tower');
 
+    // Set origin: bottom for top tower (flipped), top for bottom tower
+    tower.setOrigin(0.5, flipped ? 1 : 0);
     tower.setScale(2, flipped ? -2 : 2);
     tower.setVelocityX(-GAME_CONFIG.SPEED);
     tower.body.allowGravity = false;
-
-    // Fix physics body offset for flipped tower in Phaser 3
-    if (flipped) {
-      tower.body.setOffset(0, -tower.body.height * 2);
-    }
 
     return tower;
   }
@@ -240,15 +232,17 @@ export default class MainScene extends Phaser.Scene {
   spawnTowers() {
     const { width, height } = this.cameras.main;
     const opening = this.getOpening();
-    const towerY = ((height - 16 - opening / 2) / 2) +
-                   (Math.random() > 0.5 ? -1 : 1) * Math.random() * height / 6;
 
-    // Bottom tower
-    const botTower = this.spawnTower(towerY);
-    // Top tower (flipped)
-    const topTower = this.spawnTower(towerY, true);
+    // Calculate center Y position with random variation
+    const centerY = height / 2 + (Math.random() > 0.5 ? -1 : 1) * Math.random() * height / 6;
 
-    // Add invisible scoring trigger
+    // Top tower - extends down from centerY - opening/2
+    const topTower = this.spawnTower(centerY - opening / 2, true);
+
+    // Bottom tower - extends up from centerY + opening/2
+    const botTower = this.spawnTower(centerY + opening / 2, false);
+
+    // Add invisible scoring trigger between the towers
     const inv = this.invs.create(topTower.x + topTower.width, 0);
     inv.displayWidth = 2;
     inv.displayHeight = height;
