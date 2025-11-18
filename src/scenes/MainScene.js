@@ -229,8 +229,9 @@ export default class MainScene extends Phaser.Scene {
     tower.setVelocityX(-GAME_CONFIG.SPEED);
     tower.body.allowGravity = false;
 
+    // Fix physics body offset for flipped tower in Phaser 3
     if (flipped) {
-      tower.body.setOffset(0, -tower.body.height);
+      tower.body.setOffset(0, -tower.body.height * 2);
     }
 
     return tower;
