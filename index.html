@@ -2,38 +2,35 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
-		<link href="css/main.css" rel="stylesheet">
-		<title>Corgi Flop!</title>
-		
-		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		<!--[if lt IE 9]>
-			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-		<![endif]-->
-		
-		<meta name="description" content="A CorgiCoin faucet in the style of Flappy Bird!">
-		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<meta name="description" content="A CorgiCoin faucet game in the style of Flappy Bird!">
 		<meta name="apple-mobile-web-app-capable" content="yes">
+
+		<title>Corgi Flop!</title>
+
+		<!-- Icons -->
 		<link rel="apple-touch-icon" href="assets/icon.png">
 		<link rel="apple-touch-icon" sizes="120x120" href="assets/icon-120.png">
-		<link href='//fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+
+		<!-- Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 	</head>
-	
-	<body>
-	
-		<div class="container maincontent homepage" role="main">
-			<div id="header"><img src="assets/corgiflop.png" /></div>
+
+	<body class="homepage">
+		<div class="container maincontent" role="main">
+			<div id="header">
+				<img src="assets/corgiflop.png" alt="Corgi Flop Logo" />
+			</div>
 			<div id="screen"></div>
-			<div id="footer"><a href="about.html">about</a> &nbsp; <a href="donate.html">donate</a> &nbsp; <a href="http://corgicoin.com/">corgicoin.com</a></div>
+			<div id="footer">
+				<a href="about.html">about</a> &nbsp;
+				<a href="donate.html">donate</a> &nbsp;
+				<a href="http://corgicoin.com/">corgicoin.com</a>
+			</div>
 		</div>
-	
-		<script src="//code.jquery.com/jquery-latest.min.js"></script>
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-		<script src="js/phaser.min.js"></script>
-		<script src="js/main.min.js"></script>
-		<script src="js/modernizr.js"></script>
+
+		<script type="module" src="/src/main.js"></script>
 	</body>
 </html>

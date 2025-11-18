@@ -1,0 +1,142 @@
+/* CSS Variables for theming */
+:root {
+  --color-sky-blue: #CCEEFF;
+  --color-game-border: #accad9;
+  --color-corgi-brown: #de9542;
+  --color-link: #88aabe;
+  --color-link-hover: #466d85;
+  --color-white: #ffffff;
+  --max-game-width: 320px;
+  --max-game-height: 568px;
+}
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--color-sky-blue);
+  margin: 0;
+  padding: 0;
+  background-image: url(/assets/fence.png);
+  background-repeat: repeat-x;
+  background-position: center bottom;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Game container */
+.container {
+  padding: 0;
+}
+
+.maincontent {
+  max-width: var(--max-game-width);
+  margin: 0 auto;
+}
+
+#screen {
+  margin: 0 auto;
+  max-height: var(--max-game-height);
+  max-width: var(--max-game-width);
+  border: 1px solid var(--color-game-border);
+  position: relative;
+}
+
+/* Header and Footer */
+#header {
+  margin: 20px auto;
+  text-align: center;
+  clear: both;
+}
+
+#header img {
+  max-width: 100%;
+  height: auto;
+}
+
+#footer {
+  margin: 20px auto;
+  text-align: center;
+  color: var(--color-link);
+}
+
+/* Content body for about/donate pages */
+#body {
+  margin: 0 auto;
+  max-width: 500px;
+  background-color: var(--color-white);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Links */
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  #screen {
+    margin: 0 auto;
+    border: none;
+  }
+
+  body.homepage {
+    background-image: none;
+  }
+
+  .homepage #header {
+    display: none;
+  }
+
+  .homepage #footer {
+    display: none;
+  }
+
+  #body {
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+  .container {
+    width: 750px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    width: 970px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: 1170px;
+  }
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
