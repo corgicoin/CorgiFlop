@@ -23,7 +23,7 @@ const config = {
 };
 
 // Load Google Font
-WebFontConfig = {
+window.WebFontConfig = {
   google: {
     families: ['Press Start 2P']
   },
